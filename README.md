@@ -1,2 +1,4 @@
 # appier_examples
-Small appier example apps
+
+This repository will contain small intro apps to showcase how to use Appier (https://github.com/hivesolutions/appier)
+to build small web apps fast.
