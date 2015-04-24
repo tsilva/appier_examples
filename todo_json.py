@@ -37,8 +37,6 @@ class Todo(appier_extras.admin.Base):
 
 class TodoApp(appier.WebApp):
 
-    BASE_URL = "http://localhost:8080"
-
     def __init__(self):
         appier.WebApp.__init__(
             self, 
@@ -50,8 +48,8 @@ class TodoApp(appier.WebApp):
         todos = Todo.find(map = True)
         for todo in todos: 
             action = "uncheck" if todo["checked"] else "check"
-            todo["_%s_url" % action] = self.BASE_URL + self.url_for("todo.%s_json" % action, id = todo["id"])
-            todo["_delete_url"] = self.BASE_URL + self.url_for("todo.delete_json", id = todo["id"])
+            todo["_%s_url" % action] = self.url_for("todo.%s_json" % action, id = todo["id"], absolute = True)
+            todo["_delete_url"] = self.url_for("todo.delete_json", id = todo["id"], absolute = True)
         return todos
 
     @appier.route("/todos/new.json")
