@@ -1,3 +1,4 @@
+import time
 import appier
 import calendar
 import datetime
@@ -5,21 +6,12 @@ import appier_extras
 
 class Todo(appier_extras.admin.Base):
 
-    create_date = appier.field(
-        type = float
-    )
-
+    create_date = appier.field(type = float)
     name = appier.field()
-
-    checked = appier.field(
-        type = bool
-    )
+    checked = appier.field(type = bool)
 
     def pre_save(self):
-        self.create_date = self.now()
-
-    def pre_create(self):
-        self.checked = False
+        self.create_date = time.time()
 
     def check_s(self):
         self.checked = True
@@ -28,12 +20,6 @@ class Todo(appier_extras.admin.Base):
     def uncheck_s(self):
         self.checked = False
         self.save()
-
-    def now(self):
-        date = datetime.datetime.utcnow()
-        date_utc = date.utctimetuple()
-        timestamp = calendar.timegm(date_utc)
-        return timestamp
 
 class TodoApp(appier.WebApp):
 
@@ -55,34 +41,23 @@ class TodoApp(appier.WebApp):
     @appier.route("/todos/new.json")
     def new_todo_json(self):
         todo = Todo.new()
-        todo.name = self.get_field("name")
+        todo.name = self.field("name")
         todo.save()
-        return self.redirect(
-            self.url_for("todo.list_todos_json")
-        )
+        return self.redirect(self.url_for("todo.list_todos_json"))
 
     @appier.route("/todos/<int:id>/check.json")
     def check_json(self, id):
-        todo = Todo.get(id = id)
-        todo.check_s()
-        return self.redirect(
-            self.url_for("todo.list_todos_json")
-        )
+        todo = Todo.get(id = id).check_s()
+        return self.redirect(self.url_for("todo.list_todos_json"))
 
     @appier.route("/todos/<int:id>/uncheck.json")
     def uncheck_json(self, id):
-        todo = Todo.get(id = id)
-        todo.uncheck_s()
-        return self.redirect(
-            self.url_for("todo.list_todos_json")
-        )
+        todo = Todo.get(id = id).uncheck_s()
+        return self.redirect(self.url_for("todo.list_todos_json"))
 
     @appier.route("/todos/<int:id>/delete.json")
     def delete_json(self, id):
-        todo = Todo.get(id = id)
-        todo.delete()
-        return self.redirect(
-            self.url_for("todo.list_todos_json")
-        )
+        Todo.get(id = id).delete()
+        return self.redirect(self.url_for("todo.list_todos_json"))
 
 TodoApp().serve()
